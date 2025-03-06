@@ -50,7 +50,7 @@ func getTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, _ = w.Write(resp)
 }
 
 func postTask(w http.ResponseWriter, r *http.Request) {
@@ -69,21 +69,14 @@ func postTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, exists := tasks[task.ID]; exists {
-		http.Error(w, "Task with this ID already exists", http.StatusConflict)
+		http.Error(w, "Task with this ID already exists", http.StatusBadRequest)
 		return
 	}
 
 	tasks[task.ID] = task
 
-	resp, err := json.Marshal(task)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(resp)
 }
 
 func getTask(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +98,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(resp)
+	_, _ = w.Write(resp)
 }
 
 func deleteTask(w http.ResponseWriter, r *http.Request) {
@@ -124,9 +117,8 @@ func deleteTask(w http.ResponseWriter, r *http.Request) {
 	// Удаляем задачу из map
 	delete(tasks, id)
 
-	// Возвращаем статус 200
-	// Но лучше возвращать 204 No Content, так как задача успешно удалена
-	w.WriteHeader(http.StatusNoContent)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
